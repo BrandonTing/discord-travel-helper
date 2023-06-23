@@ -16,14 +16,14 @@ client.on('ready', () => {
     logger.info('online ')
 })
 
-client.on('interactionCreate', interaction => {
+client.on('interactionCreate', async interaction => {
     // ignore other interacrtions for now except for slash cmds
     if (!interaction.isChatInputCommand()) return
-    handleSlashCmds(interaction)
+    await handleSlashCmds(interaction)
 })
 
-client.on('messageCreate', (message) => {
-    logger.info(message);
-})
+// client.on('messageCreate', (message) => {
+//     logger.info(message);
+// })
 
 client.login(env.DISCORD_BOT_TOKEN)

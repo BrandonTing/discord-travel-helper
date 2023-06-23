@@ -12,7 +12,15 @@ export const env = envsafe({
     }),
     // TODO add discord keys
     DISCORD_BOT_TOKEN: str({
+        desc: 'DISCORD Application 的token'
     }),
     DISCORD_BOT_CLIENT_ID: str({
+        desc: 'ID of bot'
     }),
+    CURRENCY_KEY: str({
+        desc: 'key used to call api from https://app.currencyapi.com/'
+    }),
+    CURRENCIES: str({
+        desc: '要知道匯率的貨幣代碼們'
+    })
 });
