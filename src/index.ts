@@ -4,7 +4,6 @@ import { Client, IntentsBitField, } from "discord.js"
 import { logger } from "./utils/logger"
 import { handleSlashCmds, registerSlashCmds } from "./slash-commands";
 import "@total-typescript/ts-reset";
-
 const client = new Client({
     intents: [
         IntentsBitField.Flags.Guilds,

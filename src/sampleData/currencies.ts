@@ -17,3 +17,11 @@ export const sampleCurrenciesResponse = {
         }
     }
 }
+
+export type currencyErrMsg = {
+    "message": string,
+    "errors": {
+        [key: string]: string[]
+    },
+    "info": string
+}
