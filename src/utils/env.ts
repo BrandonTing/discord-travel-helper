@@ -25,5 +25,8 @@ export const env = envsafe({
     }),
     CURRENCIES: str({
         desc: '要知道匯率的貨幣代碼們'
-    })
+    }),
+    SYNC_EXCHANGE_CRON: str({
+        desc: '排程同步匯率資料的時間'
+    }),
 });
