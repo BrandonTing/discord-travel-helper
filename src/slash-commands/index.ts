@@ -1,4 +1,4 @@
-import { REST, Routes, ChatInputCommandInteraction, CacheType, RESTPutAPIApplicationCommandsJSONBody, ApplicationCommandOptionType } from 'discord.js'
+import { REST, Routes, ChatInputCommandInteraction, CacheType, RESTPutAPIApplicationCommandsJSONBody, ApplicationCommandOptionType, } from 'discord.js'
 import { logger } from '../utils/logger'
 import { env } from '../utils/env'
 import "@total-typescript/ts-reset"
@@ -20,7 +20,7 @@ enum FXNameMapping {
     HKD = "港元"
 }
 
-const commands: RESTPutAPIApplicationCommandsJSONBody = [
+const commands = [
     {
         name: CmdName.GET_JPY_EXCHANGE,
         description: 'replies with cur jpy/ntd exchange rate',
@@ -32,17 +32,22 @@ const commands: RESTPutAPIApplicationCommandsJSONBody = [
             },
             {
                 name: 'target',
-                description: '請輸入幣別代碼，預設為TWD，大小寫不影響。',
+                description: '目標幣別',
                 type: ApplicationCommandOptionType.String,
+                autocomplete: false,
+                choices: Object.entries(FXNameMapping).map((currency) => ({
+                    name: currency[1],
+                    value: currency[0]
+                }))
             },
             {
                 name: 'unit',
-                description: '請輸入兌換單位，預設為一',
+                description: '請輸入兌換單位，預設為1',
                 type: ApplicationCommandOptionType.Number,
             },
         ]
     }
-]
+] satisfies RESTPutAPIApplicationCommandsJSONBody
 const rest = new REST({ version: '10' }).setToken(env.DISCORD_BOT_TOKEN)
 
 async function syncExchange() {
@@ -126,11 +131,9 @@ async function handleGetJPYExchange(interacrtion: ChatInputCommandInteraction<Ca
     // https://api.currencyapi.com/v3/latest?apikey=the_key&currencies=TWD%2CHKD%2CMYR&base_currency=JPY
     try {
         const fileData = JSON.parse(readFileSync(filePath, 'utf8')) as CurrenciesResponse;
-
         const exchangeRate = fileData.data[targetCurrency]?.value;
-        const outputUnit = is_from_jpy ? Math.floor(unit * exchangeRate) : Math.floor(unit / exchangeRate)
+        const outputUnit = is_from_jpy ? (unit * exchangeRate).toFixed(2) : (unit / exchangeRate).toFixed(2)
         interacrtion.reply(`${unit} ${is_from_jpy ? "日幣" : targetCurName}換算 ${outputUnit} ${is_from_jpy ? targetCurName : "日幣"}`)
-
     } catch (err) {
         logger.error(`err: ${err}`)
     }
