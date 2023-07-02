@@ -2,9 +2,10 @@ import "dotenv/config"
 import { env } from "./utils/env"
 import { Client, IntentsBitField, REST, RESTPutAPIApplicationCommandsJSONBody, Routes, } from "discord.js"
 import { logger } from "./utils/logger"
-import { getSlashCmds, handleSlashCmds, } from "./slash-commands";
+import { getSlashCmds, handleSlashCmds, } from "./slashCommands";
 import "@total-typescript/ts-reset";
 import { getUserContextCmds } from "./userContextCmds";
+import { getMsgContextCmds, handleMsgContextMenuCmds } from "./msgMenuCmds";
 const client = new Client({
     intents: [
         IntentsBitField.Flags.Guilds,
@@ -30,13 +31,16 @@ client.on('ready', async () => {
     const rest = new REST({ version: '10' }).setToken(env.DISCORD_BOT_TOKEN)
     const slashCmds = await getSlashCmds();
     const userContextCmds = getUserContextCmds()
-    const cmds = slashCmds.concat
-    await registerCmds(rest, [...slashCmds, ...userContextCmds])
+    const msgMenuCmds = getMsgContextCmds()
+    await registerCmds(rest, [...slashCmds, ...userContextCmds, ...msgMenuCmds])
     logger.info('online ')
 })
 
 client.on('interactionCreate', async interaction => {
     // ignore other interacrtions for now except for slash cmds
+    if (interaction.isMessageContextMenuCommand()) {
+        await handleMsgContextMenuCmds(interaction)
+    }
     if (!interaction.isChatInputCommand()) return
     await handleSlashCmds(interaction)
 })
