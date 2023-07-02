@@ -9,12 +9,14 @@ import path from 'path'
 import { CronJob } from 'cron';
 
 const dataFolder = path.join(__dirname, '..', '..', 'data');
-mkdir(dataFolder, (err) => {
-    if (err) {
-        logger.error(err)
-    }
-    console.log('Directory created successfully!');
-});
+if (!existsSync(dataFolder)) {
+    mkdir(dataFolder, (err) => {
+        if (err) {
+            logger.error(err)
+        }
+        console.log('Directory created successfully!');
+    });
+}
 const filePath = path.join(dataFolder, 'exchange.json')
 
 enum CmdName {
