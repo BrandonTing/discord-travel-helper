@@ -4,11 +4,18 @@ import { env } from '../utils/env'
 import "@total-typescript/ts-reset"
 import { CurrenciesResponse, CurrencyErrMsg } from '../type/exchange/currencies'
 import { sampleCurrenciesResponse } from '../sampleData/currencies'
-import { existsSync, readFileSync, writeFileSync } from 'fs'
+import { existsSync, readFileSync, writeFileSync, mkdir } from 'fs'
 import path from 'path'
 import { CronJob } from 'cron';
 
-const filePath = path.join(__dirname, '..', '..', 'data', 'exchange.json')
+const dataFolder = path.join(__dirname, '..', '..', 'data');
+mkdir(dataFolder, (err) => {
+    if (err) {
+        logger.error(err)
+    }
+    console.log('Directory created successfully!');
+});
+const filePath = path.join(dataFolder, 'exchange.json')
 
 enum CmdName {
     GET_JPY_EXCHANGE = 'jpy_exchange'
@@ -51,7 +58,7 @@ const commands = [
 const rest = new REST({ version: '10' }).setToken(env.DISCORD_BOT_TOKEN)
 
 async function syncExchange() {
-    if (!existsSync(path.join(__dirname, '..', '..', 'data', 'exchange.json'))) {
+    if (!existsSync(filePath)) {
         logger.info('create initital data...')
         const currencyApiUrl = `https://api.currencyapi.com/v3/latest?apikey=${env.CURRENCY_KEY}&currencies=${encodeURIComponent(env.CURRENCIES)}&base_currency=JPY`
         try {
