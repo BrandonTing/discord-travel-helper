@@ -1,9 +1,10 @@
 import "dotenv/config"
 import { env } from "./utils/env"
-import { Client, IntentsBitField, } from "discord.js"
+import { Client, IntentsBitField, REST, RESTPutAPIApplicationCommandsJSONBody, Routes, } from "discord.js"
 import { logger } from "./utils/logger"
-import { handleSlashCmds, registerSlashCmds } from "./slash-commands";
+import { getSlashCmds, handleSlashCmds, } from "./slash-commands";
 import "@total-typescript/ts-reset";
+import { getUserContextCmds } from "./userContextCmds";
 const client = new Client({
     intents: [
         IntentsBitField.Flags.Guilds,
@@ -12,8 +13,25 @@ const client = new Client({
     ]
 })
 
-client.on('ready', () => {
-    registerSlashCmds()
+async function registerCmds(rest: REST, cmds: RESTPutAPIApplicationCommandsJSONBody) {
+    try {
+        logger.info('registering slash cmds')
+        // await setupExchangeSync()
+        await rest.put(Routes.applicationCommands(env.DISCORD_BOT_CLIENT_ID), {
+            body: cmds
+        })
+    } catch (err) {
+        logger.error(`regiester slash cmds error: ${err}`)
+    }
+}
+
+
+client.on('ready', async () => {
+    const rest = new REST({ version: '10' }).setToken(env.DISCORD_BOT_TOKEN)
+    const slashCmds = await getSlashCmds();
+    const userContextCmds = getUserContextCmds()
+    const cmds = slashCmds.concat
+    await registerCmds(rest, [...slashCmds, ...userContextCmds])
     logger.info('online ')
 })
 

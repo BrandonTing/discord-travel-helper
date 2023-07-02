@@ -7,17 +7,8 @@ import { sampleCurrenciesResponse } from '../sampleData/currencies'
 import { existsSync, readFileSync, writeFileSync, mkdir } from 'fs'
 import path from 'path'
 import { CronJob } from 'cron';
-
-const dataFolder = path.join(__dirname, '..', '..', 'data');
-if (!existsSync(dataFolder)) {
-    mkdir(dataFolder, (err) => {
-        if (err) {
-            logger.error(err)
-        }
-        console.log('Directory created successfully!');
-    });
-}
-const filePath = path.join(dataFolder, 'exchange.json')
+import { filePath } from './utils/getExchangeFilePath'
+import { setupExchangeSync } from './utils/syncExchange'
 
 enum CmdName {
     GET_JPY_EXCHANGE = 'jpy_exchange'
@@ -57,65 +48,13 @@ const commands = [
         ]
     }
 ] satisfies RESTPutAPIApplicationCommandsJSONBody
-const rest = new REST({ version: '10' }).setToken(env.DISCORD_BOT_TOKEN)
 
-async function syncExchange() {
-    if (!existsSync(filePath)) {
-        logger.info('create initital data...')
-        const currencyApiUrl = `https://api.currencyapi.com/v3/latest?apikey=${env.CURRENCY_KEY}&currencies=${encodeURIComponent(env.CURRENCIES)}&base_currency=JPY`
-        try {
-            const data = await (await fetch(currencyApiUrl)).json();
-            writeFileSync(filePath, JSON.stringify(data));
-        } catch (err) {
-            logger.error(`init currency file failed: ${err}`)
-        }
-    } else {
-        logger.info('fetch and compare last updated time')
-        const fileData = JSON.parse(readFileSync(filePath, 'utf8')) as CurrenciesResponse;
-        try {
-            const currencyApiUrl = `https://api.currencyapi.com/v3/latest?apikey=${env.CURRENCY_KEY}&currencies=${encodeURIComponent(env.CURRENCIES)}&base_currency=JPY`
-            const data = await (await fetch(currencyApiUrl)).json() as CurrencyErrMsg | CurrenciesResponse;
-            if ("errors" in data) {
-                logger.error(`轉換匯率錯誤：${Object.entries(data.errors).reduce((pre, cur) => {
-                    return pre + `
-                        ${cur[0]}: ${cur[1]}
-                    `
-                }, '')}`);
-                return
-            }
-            if (fileData.meta.last_updated_at !== data.meta.last_updated_at) {
-                writeFileSync(filePath, JSON.stringify(data));
-            }
-        } catch (err) {
-            logger.error(`init currency file failed: ${err}`)
-        }
-    }
-}
-
-async function setupExchangeSync() {
-    // 排程抓匯率存local
-    if (!env.CALL_CURRENCY_API) {
-        if (!existsSync(filePath)) {
-            writeFileSync(filePath, JSON.stringify(sampleCurrenciesResponse));
-        }
-        return
-    }
-    await syncExchange()
-    // create cron job
-    const syncExhchangeJob = new CronJob(env.SYNC_EXCHANGE_CRON, async () => {
-        await syncExchange()
-    });
-    syncExhchangeJob.start();
-    logger.info(`sync exchange job started, cron: ${env.SYNC_EXCHANGE_CRON}`)
-}
-
-export async function registerSlashCmds() {
+export async function getSlashCmds() {
     try {
         logger.info('registering slash cmds')
+        // required functions before register slash cmds 
         await setupExchangeSync()
-        await rest.put(Routes.applicationCommands(env.DISCORD_BOT_CLIENT_ID), {
-            body: commands
-        })
+        return commands
     } catch (err) {
         logger.error(`regiester slash cmds error: ${err}`)
     }
