@@ -13,8 +13,7 @@
   "author": "brandon",
   "license": "ISC",
   "engines": {
-    "node": ">=18.11",
-    "pnpm": ">=7.27"
+    "node": ">=18.11"
   },
   "devDependencies": {
     "@total-typescript/ts-reset": "^0.4.2",
