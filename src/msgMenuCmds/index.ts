@@ -1,6 +1,6 @@
 import { ApplicationCommandType, MessageContextMenuCommandInteraction, RESTPutAPIApplicationCommandsJSONBody } from "discord.js";
 import { logger } from "../utils/logger";
-import { openai } from "../utils/openai";
+import { translate } from "../utils/googleCloud";
 
 enum CmdName {
     TRANSLATE_TO_JP = 'translate to Japanese'
@@ -27,17 +27,8 @@ export function getMsgContextCmds() {
 export async function handleTranslateToJP(interacrtion: MessageContextMenuCommandInteraction) {
     const content = interacrtion.targetMessage.content
     try {
-        // FIXME always return 429
-        const translateResponse = await openai.createCompletion({
-            model: "gpt-3.5-turbo",
-            prompt: `Translate this into Japanese:\n\n${content}\n\n`,
-            temperature: 0.3,
-            max_tokens: 100,
-            top_p: 1.0,
-            frequency_penalty: 0.0,
-            presence_penalty: 0.0,
-        });
-        logger.info(translateResponse.data);
+        const [translation] = await translate.translate(content, 'ja');
+        interacrtion.reply(translation)
     } catch (err) {
         logger.error(`[openai] translate failed: ${err}`)
     }

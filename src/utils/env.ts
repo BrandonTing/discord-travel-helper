@@ -31,5 +31,9 @@ export const env = envsafe({
     }),
     OPENAI_API_KEY: str({
         desc: 'key for openai api'
-    })
+    }),
+    GOOGLE_CLOUD_PROJECT_ID: str({
+        desc: 'key for google cloud api'
+    }),
+    GOOGLE_CLOUD_KEY: str({})
 });
