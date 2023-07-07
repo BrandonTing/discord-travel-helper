@@ -1,6 +1,6 @@
 import { ApplicationCommandType, MessageContextMenuCommandInteraction, RESTPutAPIApplicationCommandsJSONBody } from "discord.js";
-import { logger } from "../utils/logger";
-import { translate } from "../utils/googleCloud";
+import { logger } from "../../utils/logger";
+import { translate } from "../../utils/googleCloud";
 import { toRomaji } from 'wanakana';
 enum CmdName {
     TRANSLATE_TO_JP = '翻譯至日文',
