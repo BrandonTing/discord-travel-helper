@@ -1,12 +1,8 @@
-import { REST, Routes, ChatInputCommandInteraction, CacheType, RESTPutAPIApplicationCommandsJSONBody, ApplicationCommandOptionType, } from 'discord.js'
+import { ChatInputCommandInteraction, CacheType, RESTPutAPIApplicationCommandsJSONBody, ApplicationCommandOptionType, } from 'discord.js'
 import { logger } from '../utils/logger'
-import { env } from '../utils/env'
 import "@total-typescript/ts-reset"
-import { CurrenciesResponse, CurrencyErrMsg } from '../type/exchange/currencies'
-import { sampleCurrenciesResponse } from '../sampleData/currencies'
-import { existsSync, readFileSync, writeFileSync, mkdir } from 'fs'
-import path from 'path'
-import { CronJob } from 'cron';
+import { CurrenciesResponse, } from '../type/exchange/currencies'
+import { readFileSync, } from 'fs'
 import { filePath } from './utils/getExchangeFilePath'
 import { setupExchangeSync } from './utils/syncExchange'
 
@@ -27,7 +23,7 @@ const commands = [
         options: [
             {
                 name: 'is_from_jpy',
-                description: 'True為日幣換指定幣別',
+                description: 'True為日圓換指定幣別',
                 type: ApplicationCommandOptionType.Boolean,
             },
             {
@@ -81,7 +77,7 @@ async function handleGetJPYExchange(interacrtion: ChatInputCommandInteraction<Ca
         const fileData = JSON.parse(readFileSync(filePath, 'utf8')) as CurrenciesResponse;
         const exchangeRate = fileData.data[targetCurrency]?.value;
         const outputUnit = is_from_jpy ? (unit * exchangeRate).toFixed(2) : (unit / exchangeRate).toFixed(2)
-        interacrtion.reply(`${unit} ${is_from_jpy ? "日幣" : targetCurName}換算 ${outputUnit} ${is_from_jpy ? targetCurName : "日幣"}`)
+        interacrtion.reply(`${unit} ${is_from_jpy ? "日圓" : targetCurName}換算 ${outputUnit} ${is_from_jpy ? targetCurName : "日圓"}`)
     } catch (err) {
         logger.error(`err: ${err}`)
     }

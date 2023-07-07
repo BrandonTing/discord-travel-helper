@@ -29,4 +29,11 @@ export const env = envsafe({
     SYNC_EXCHANGE_CRON: str({
         desc: '排程同步匯率資料的時間'
     }),
+    OPENAI_API_KEY: str({
+        desc: 'key for openai api'
+    }),
+    GOOGLE_CLOUD_PROJECT_ID: str({
+        desc: 'key for google cloud api'
+    }),
+    GOOGLE_CLOUD_KEY: str({})
 });
