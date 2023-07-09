@@ -6,6 +6,12 @@ import { env } from "../../utils/env";
 import { sampleCurrenciesResponse } from "../../sampleData/currencies";
 import { CronJob } from "cron";
 
+export enum FXNameMapping {
+    TWD = "新台幣",
+    MYR = "馬來西亞林吉特",
+    HKD = "港元"
+}
+
 async function syncExchange() {
     if (!existsSync(filePath)) {
         logger.info('create initital data...')
@@ -54,4 +60,10 @@ export async function setupExchangeSync() {
     });
     syncExhchangeJob.start();
     logger.info(`sync exchange job started, cron: ${env.SYNC_EXCHANGE_CRON}`)
+}
+
+export function getExchange(targetCurrency: keyof typeof FXNameMapping) {
+    const fileData = JSON.parse(readFileSync(filePath, 'utf8')) as CurrenciesResponse;
+    const exchangeRate = fileData.data[targetCurrency]?.value;
+    return exchangeRate
 }
