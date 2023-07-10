@@ -1,6 +1,5 @@
 import { ChatInputCommandInteraction, CacheType, RESTPutAPIApplicationCommandsJSONBody, ApplicationCommandOptionType, } from 'discord.js'
 import { logger } from '../../utils/logger'
-import "@total-typescript/ts-reset"
 import { CurrenciesResponse, } from '../../type/exchange/currencies'
 import { readFileSync, } from 'fs'
 import { filePath } from '../utils/getExchangeFilePath'

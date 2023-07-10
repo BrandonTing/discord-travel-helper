@@ -3,10 +3,10 @@ import { env } from "./utils/env"
 import { Client, IntentsBitField, REST, RESTPutAPIApplicationCommandsJSONBody, Routes, } from "discord.js"
 import { logger } from "./utils/logger"
 import { getSlashCmds, handleSlashCmds, } from "./cmds/slashCommands";
-import "@total-typescript/ts-reset";
 import { getUserContextCmds, handlerUserContextCmds } from "./cmds/userContextCmds";
 import { getMsgContextCmds, handleMsgContextMenuCmds } from "./cmds/msgMenuCmds";
 import { preCmdFunctions } from "./cmds/preCmdFunctions";
+
 const client = new Client({
     intents: [
         IntentsBitField.Flags.Guilds,
