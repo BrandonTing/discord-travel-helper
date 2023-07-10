@@ -1,7 +1,9 @@
 import { ApplicationCommandType, MessageContextMenuCommandInteraction, RESTPutAPIApplicationCommandsJSONBody } from "discord.js";
 import { logger } from "../../utils/logger";
 import { translate } from "../../utils/googleCloud";
-import { toRomaji } from 'wanakana';
+import { toKatakana, toRomaji } from 'wanakana';
+import { kuromojiBuilder } from "../utils/koromoji";
+
 enum CmdName {
     TRANSLATE_TO_JP = '翻譯至日文',
     TRANSLATE_FROM_JP_TO_ZHTW = '日文翻譯至繁體中文'
@@ -31,16 +33,24 @@ export function getMsgContextCmds() {
 }
 
 async function handleTranslateToJP(interacrtion: MessageContextMenuCommandInteraction) {
-    const content = interacrtion.targetMessage.content
+    const content = interacrtion.targetMessage.content;
+    const [translation] = await translate.translate(content, 'ja');
+
     try {
-        const [translation] = await translate.translate(content, 'ja');
         // 把日文轉羅馬拼音
-        const targetRomaji = toRomaji(translation)
-        interacrtion.reply(`
-            ${translation}(${targetRomaji})
-        `)
+        kuromojiBuilder.build(function (err, tokenizer) {
+            if (err) throw err;
+
+            // Tokenize the Kanji text
+            const tokens = tokenizer.tokenize(translation);
+
+            const romaji = tokens.map(token => toRomaji(token.reading || token.surface_form)).join(' ')
+
+            interacrtion.reply(`${translation}(${romaji})`)
+        })
     } catch (err) {
         logger.error(`[google clound translate] translate to ja failed: ${err}`)
+        interacrtion.reply('[google clound translate] translate to ja failed')
     }
 }
 
