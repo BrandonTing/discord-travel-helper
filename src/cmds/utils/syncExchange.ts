@@ -3,7 +3,7 @@ import { filePath } from "./getExchangeFilePath";
 import { logger } from "../../utils/logger";
 import { CurrenciesResponse, CurrencyErrMsg } from "../../type/exchange/currencies";
 import { env } from "../../utils/env";
-import { sampleCurrenciesResponse } from "../../sampleData/currencies";
+import { sampleCurrenciesResponse } from "../../../sampleData/currencies";
 import { CronJob } from "cron";
 
 export enum FXNameMapping {
