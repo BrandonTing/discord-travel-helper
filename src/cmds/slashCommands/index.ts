@@ -1,19 +1,13 @@
 import { ChatInputCommandInteraction, CacheType, RESTPutAPIApplicationCommandsJSONBody, ApplicationCommandOptionType, } from 'discord.js'
-import { logger } from '../utils/logger'
+import { logger } from '../../utils/logger'
 import "@total-typescript/ts-reset"
-import { CurrenciesResponse, } from '../type/exchange/currencies'
+import { CurrenciesResponse, } from '../../type/exchange/currencies'
 import { readFileSync, } from 'fs'
-import { filePath } from './utils/getExchangeFilePath'
-import { setupExchangeSync } from './utils/syncExchange'
+import { filePath } from '../utils/getExchangeFilePath'
+import { FXNameMapping } from '../utils/syncExchange'
 
 enum CmdName {
     GET_JPY_EXCHANGE = 'jpy_exchange'
-}
-
-enum FXNameMapping {
-    TWD = "新台幣",
-    MYR = "馬來西亞林吉特",
-    HKD = "港元"
 }
 
 const commands = [
@@ -45,11 +39,10 @@ const commands = [
     }
 ] satisfies RESTPutAPIApplicationCommandsJSONBody
 
-export async function getSlashCmds() {
+export function getSlashCmds() {
     try {
         logger.info('registering slash cmds')
         // required functions before register slash cmds 
-        await setupExchangeSync()
         return commands
     } catch (err) {
         logger.error(`regiester slash cmds error: ${err}`)
